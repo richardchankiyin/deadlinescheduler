@@ -7,6 +7,7 @@ import java.util.Queue;
 import java.util.function.Consumer;
 
 public class DeadlineEngineImpl implements DeadlineEngine {
+	private static final int WAITTIMEMS = 100;
 	private Map<Long, Deadline> requestIdToDeadlineMap = null;
 	private Queue<Deadline> deadlineQueue = null;
 	private DeadlineFactory factory = null;
@@ -34,6 +35,14 @@ public class DeadlineEngineImpl implements DeadlineEngine {
 		return deadline != null;
 	}
 
+	private void pause() {
+		try {
+			Thread.sleep(WAITTIMEMS);
+		} catch (Exception e) {
+			
+		}		
+	}
+	
 	@Override
 	public int poll(long nowMs, Consumer<Long> handler, int maxPoll) {
 		boolean isContinue = true;
@@ -66,6 +75,10 @@ public class DeadlineEngineImpl implements DeadlineEngine {
 			} else {
 				// deadline time is after now, finish
 				isContinue = false;
+			}
+			
+			if (isContinue) {
+				pause();
 			}
 		}
 		return result;
